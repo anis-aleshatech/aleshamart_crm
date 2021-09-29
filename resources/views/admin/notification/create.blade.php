@@ -70,19 +70,21 @@
                                         <option value="">---Select User ---</option>
                                         @foreach($users as $user)
                                         @if($user->name != null)
-                                                <option value="{{$user->id}}">{{$user->name}}</option>
+                                                <option value="{{$user->id}}">{{$user->name}} ({{$user->phone}})</option>
+                                                
                                             @else
                                                 <option selected disabled value="0">There have no User</option>
                                             @endif
                                         @endforeach
                                     </select>
-
+                                   
                                     @if ($errors->has('user'))
                                         <span class="invalid-feedback" role="alert">
                                     <strong>{{ $errors->first('user') }}</strong>
                                 </span>
                                     @endif
                                 </div>
+                               
                             </div>
 
                             <div class="form-group row">
@@ -110,7 +112,8 @@
                             <div class="form-group row">
                                 <label for="division_id" class="col-md-2 col-form-label text-md-right">{{ __('Message Body') }}</label>
                                 <div class="col-md-6">
-                                    <textarea name="details" id="details" cols="30" rows="10" class="form-control{{ $errors->has('details') ? ' is-invalid' : '' }}" autofocus required></textarea>
+                                    <textarea name="details" id="details" cols="30" rows="10" class="form-control{{ $errors->has('details') ? ' is-invalid' : '' }}" autofocus required onkeypress="messageCount()" onkeyup="messageCount()"></textarea>
+                                    <p class="my-2"> Total Character Counter: <span id="wordCount">0</span> Character. Total SMS: <span id="messageCount">0</span></p>
                                     @if ($errors->has('details'))
                                         <span class="invalid-feedback" role="alert">
                                     <strong>{{ $errors->first('details') }}</strong>
@@ -153,10 +156,14 @@
                 };
                 axios.post("{{route('notification.template.ajax')}}", data)
                 .then(function (response) {
+                    console.log(response.data.message);
                     if (response.data.message) {
-                        $('#message').val(response.data.message)
+                        let message=response.data.message;
+                        $('#details').val(message)
+                        $('#wordCount').html(message.length)
+                        $('#messageCount').html(Math.ceil((message.length)/160))
                     }else{
-                        $('#message').attr("placeholder", "Data is not Available....");
+                        $('#details').attr("placeholder", "Data is not Available....");
                     }
                 })
                 .catch(function (error) {
@@ -166,6 +173,12 @@
 
             });
         });
+
+        function messageCount() {
+            let messageLenght= $('#details').val().length;
+            $('#wordCount').html(messageLenght)
+            $('#messageCount').html(Math.ceil(messageLenght/160))
+        }
 
         $(document).ready(function() {
             $('#user').select2();

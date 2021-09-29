@@ -3,18 +3,17 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Customer;
-use App\Models\Merchant;
+use App\Models\Customer; 
 use App\Models\Notification;
 use App\Models\NotificationsType;
 use App\Models\NotificationTemplate;
 use App\Models\User;
 use App\Models\UsersType;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use kcfinder\file;
+use Illuminate\Support\Facades\Auth; 
 use Validator;
 use Intervention\Image\Facades\Image;
+use App\Helpers\Helper;
 class NotificationController extends Controller
 {
     /**
@@ -61,12 +60,23 @@ class NotificationController extends Controller
                 'details' => 'required|string',
             ]);
        
+            
+            $user=User::find($request->user_id);
             $notification = new Notification();
-            $notification->user_id      = $request->user_id;
+            $notification->user_id      = $user->id;
+            $notification->name      = $user->name;
+            $notification->phone      = $user->phone;
             $notification->topic_type   = $request->topic_type;
             $notification->details      = $request->details;
-            $notification->save();
-            return  redirect()->route('notification.index')->with('success', 'Create Successfully !');
+            $result=$notification->save();
+          
+            if($result){
+                $otp=Helper::sendSMS( '88'.$user->phone, $request->details, 1);
+                return  redirect()->route('notification.index')->with('success', 'SMS Send Successfully !');
+            }else{
+
+                return  redirect()->back()->with('error', 'Something Wrong.. !');
+            }
         }
     }
     public function notificationEdit($id) {
@@ -283,7 +293,7 @@ class NotificationController extends Controller
 
 
     public function notificationTemplateEdit($id) {
-        $notificationTemplate = notificationTemplate::find($id);
+        $notificationTemplate = NotificationTemplate::find($id);
         $notificationsTypes = NotificationsType::all();
         return view('admin.notification.notification-template-edit',compact('notificationTemplate', 'notificationsTypes'));
     }
