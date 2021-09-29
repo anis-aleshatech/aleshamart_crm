@@ -34,7 +34,7 @@
                             <li class=""><a  href="javascript:void()" onclick="permissions('news','0');" style="color:#000; margin-right:20px;" class="btn btn-warning btn-sm"><i class="fa fa-times"></i> Disapproved</a></li>
                         @endif
                         @if($permission->can('notification.delete'))
-                            <li class=""><a  href="javascript:void()" onclick="deletedata('masterdelete','news');" style="color:#fff; margin-right:20px;" class="btn btn-danger btn-sm"><i class="fa fa-times"></i> Multiple Delete</a></li>
+                            <li class=""><a  href="javascript:void()" onclick="deletedata('/administration/masterdelete','notifications');" style="color:#fff; margin-right:20px;" class="btn btn-danger btn-sm"><i class="fa fa-times"></i> Multiple Delete</a></li>
                         @endif
                         @if($permission->can('notification.create'))
                             <li class=""><a  href="{{ route('admin.create.notification') }}" style="color:#fff; margin-right:20px" class="btn btn-primary btn-sm"><i class="fa fa-plus"></i> Create New Notification</a></li>
@@ -71,17 +71,18 @@
                                 <th width="5%"><input name="checkbox" onclick='checkedAll();' type="checkbox" readonly="readonly" /></th>
                                 @endif
                                 <th width="10%">Type </th>
-                                <th width="40%">Headline </th>
-                                <th width="10%">File</th>
-                                <th width="10%">Read status</th>
-                                <th width="5%">Status</th>
+                                <th width="20%">Message Body </th>
+                                <th width="20%">Receiver </th>
                                 @if($permission->can('notification.edit') || $permission->can('notification.delete'))
                                 <th width="10%" align="right">Action</th>
                                 @endif
                             </tr>
                             </thead>
                             <tbody>
-                            <?php $i=0; ?>
+                            <?php 
+                            $i=0; 
+                            
+                            ?>
                             @foreach($notifications as $notification)
                                 <?php $i++;
                                
@@ -93,23 +94,22 @@
                                     @endif
                                     {{-- <td align="center" valign="top"><input type="checkbox"  name="summe_code[]" id="summe_code<?php echo $i; ?>" value="{{ $notification->id }}" /></td> --}}
                                     <td align="center" valign="top">{{ $notification->notificationTypes->name }}</td>
-                                    <td align="center" valign="top">{{ $notification->usersType->name }}</td>
                                     <td align="center" valign="top">{!! Str::limit($notification->details,40) !!}</td>
-                                    <td align="center" valign="top">@if($notification->image!="")<a href="{{ asset('uploads/notification/'.$notification->image) }}" target="_blank" style="text-align:center; color:#fff">
-                                            <img src="{{ asset('uploads/notification/'.$notification->image) }}" style="width:100px; height:100px" /></a>@endif</td>
-
-                                    <td><b>@if($notification->read_status == 1) <button class="btn btn-success">Active</button> @else <button class="btn btn-warning">Inactive</button>  @endif</td>
-                                    <td><b>@if($notification->status == 1) <button class="btn btn-success">Active</button> @else <button class="btn btn-warning">Inactive</button>  @endif</td>
+                                    <td align="center" valign="top"> 
+                                       
+                                        @foreach ($notification->users as $user)
+                                        {{$user->name}}         
+                                        @endforeach
+                                     
+                                    </td>
+                                   
+                                    
                                     @if($permission->can('notification.edit') || $permission->can('notification.delete'))
                                     <td align="center" valign="top">
-                                    @if($permission->can('notification.edit'))
-                                        <div style="width:50%; float:left">
-                                            <a href="{{ route('notification.edit', $notification->id) }}" class="btn btn-warning" style="font-size: 12px; float:left; padding:3px 5px"><i class="fa fa-edit"></i></a>                              
-                                        </div>
-                                    @endif
+                                  
                                     @if($permission->can('notification.delete'))
                                         <div style="width:50%; float:left">
-                                            <button type="button" class="btn btn-danger" style="font-size: 12px; float:left; padding:3px 5px" onclick="deleteSingle('<?php echo $notification->id;?>','masterdelete','news')"><i class="fa fa-trash"></i></button>
+                                            <button type="button" class="btn btn-danger" style="font-size: 12px; float:left; padding:3px 5px" onclick="deleteSingle('<?php echo $notification->id;?>','/administration/masterdelete','notifications')"><i class="fa fa-trash"></i></button>
                                         </div>
                                     @endif
                                     </td>

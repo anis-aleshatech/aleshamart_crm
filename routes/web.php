@@ -222,6 +222,7 @@ Route::group(['prefix' => 'administration','namespace'=> 'Admin','middleware' =>
     Route::post('/notification/template/store','NotificationController@notificationTemplateStore')->name('notification.template.store');
     Route::get('/notification/template/edit/{id}','NotificationController@notificationTemplateEdit')->name('notification.template.edit');
     Route::post('/notification/template/update','NotificationController@notificationTemplateUpdate')->name('notification.template.update');
+    Route::post('/notification/template/ajax','NotificationController@notificationTypeAjax')->name('notification.template.ajax');
 
     //Notification User type
     Route::get('/notification/user/type','NotificationController@notificationUserType')->name('notification.user.type');

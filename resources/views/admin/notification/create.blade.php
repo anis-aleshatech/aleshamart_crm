@@ -55,57 +55,42 @@
                 </div>
                 <div class="card-body p-0" style="margin-top: 30px;margin-bottom: 30px;">
                     <table class="table table-striped projects">
+                        
                         <form method="POST" action="{{ route('notification.store') }}" enctype="multipart/form-data">
                             @csrf
+                        
+
+                            <div id="user_area">
+                           
                             <div class="form-group row">
-                                <label for="division_id" class="col-md-2 col-form-label text-md-right">{{ __('User Type') }}</label>
+                                <label for="division_id" class="col-md-2 col-form-label text-md-right">{{ __('Sender') }}</label>
                                 <div class="col-md-6">
-                                    <select name="user_type"  id="user_type" onchange="userFunction(this.value)" class="form-control user_type">
-                                        <option selected disabled value="">---Select User Type ---</option>
-                                        @foreach($userTypes as $userType)
-                                            @if($userType->name != null)
-                                                <option value="{{$userType->type}}">{{$userType->name}}</option>
+                                    {{-- <input id="division_id" type="email" class="form-control{{ $errors->has('division_id') ? ' is-invalid' : '' }}" name="division_id" value="{{ old('division_id') }}" autofocus> --}}
+                                    <select name="user_id" class="form-control" id="user" required>
+                                        <option value="">---Select User ---</option>
+                                        @foreach($users as $user)
+                                        @if($user->name != null)
+                                                <option value="{{$user->id}}">{{$user->name}}</option>
                                             @else
-                                                <option selected disabled >There have no user type</option>
+                                                <option selected disabled value="0">There have no User</option>
                                             @endif
                                         @endforeach
                                     </select>
-                                    @if ($errors->has('user_type'))
+
+                                    @if ($errors->has('user'))
                                         <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $errors->first('user_type') }}</strong>
+                                    <strong>{{ $errors->first('user') }}</strong>
                                 </span>
                                     @endif
                                 </div>
                             </div>
 
-                            <div id="user_area" style="display: none">
-                                <div class="form-group row">
-                                    <label for="" class="col-md-2 col-form-label text-md-right">{{ __('Customer') }}</label>
-                                    <div class="col-md-6">
-                                        <select name="user_id" class="form-control">
-                                            <option selected disabled value="0">---Select Customer Type ---</option>
-                                            @foreach($customers as $customer)
-                                                @if($customer->fullname != null)
-                                                    <option value="{{$customer->id}}">{{$customer->fullname}}</option>
-                                                @else
-                                                    <option selected disabled value="0">There have no user type</option>
-                                                @endif
-                                            @endforeach
-                                        </select>
-                                            @if ($errors->has('user_id'))
-                                                <span class="invalid-feedback" role="alert">
-                                                    <strong>{{ $errors->first('user_id') }}</strong>
-                                                </span>
-                                            @endif
-                                    </div>
-                                </div>
-                            </div>
                             <div class="form-group row">
                                 <label for="division_id" class="col-md-2 col-form-label text-md-right">{{ __('Notification Type') }}</label>
                                 <div class="col-md-6">
                                     {{-- <input id="division_id" type="email" class="form-control{{ $errors->has('division_id') ? ' is-invalid' : '' }}" name="division_id" value="{{ old('division_id') }}" autofocus> --}}
-                                    <select name="topic_type" class="form-control">
-                                        <option selected disabled value="0">---Select Notification Type ---</option>
+                                    <select name="topic_type" class="form-control" id="topic_type" required>
+                                        <option value="">---Select Notification Type ---</option>
                                         @foreach($notificationTypes as $notificationType)
                                         @if($notificationType->name != null)
                                                 <option value="{{$notificationType->id}}">{{$notificationType->name}}</option>
@@ -122,13 +107,10 @@
                                     @endif
                                 </div>
                             </div>
-
                             <div class="form-group row">
-                                <label for="name" class="col-md-2 col-form-label text-md-right">{{ __('Details') }}</label>
-
+                                <label for="division_id" class="col-md-2 col-form-label text-md-right">{{ __('Message Body') }}</label>
                                 <div class="col-md-6">
-                                    <textarea id="details" type="text" class="form-control ckeditor" name="details" required autofocus>{{ old('details') }}</textarea>
-
+                                    <textarea name="details" id="details" cols="30" rows="10" class="form-control{{ $errors->has('details') ? ' is-invalid' : '' }}" autofocus required></textarea>
                                     @if ($errors->has('details'))
                                         <span class="invalid-feedback" role="alert">
                                     <strong>{{ $errors->first('details') }}</strong>
@@ -136,36 +118,9 @@
                                     @endif
                                 </div>
                             </div>
+                    
 
-                            <div class="form-group row">
-                                <label for="photo" class="col-md-2 col-form-label text-md-right">{{ __('Banner') }}</label>
-
-                                <div class="col-md-6">
-                                    <input id="image" type="file" class="form-control" name="image">
-
-                                    @if ($errors->has('image'))
-                                        <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $errors->first('image') }}</strong>
-                                </span>
-                                    @endif
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                                <label for="division_id" class="col-md-2 col-form-label text-md-right">{{ __('Status') }}</label>
-                                <div class="col-md-6">
-                                    <select name="status" class="form-control">
-                                        <option value="1" class="form-control">Active</option>
-                                        <option value="0" class="form-control">Inactive</option>
-                                    </select>
-                                    @if ($errors->has('status'))
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $errors->first('status') }}</strong>
-                                         </span>
-                                    @endif
-                                </div>
-                            </div>
-
+                         
                             <div class="form-group row mb-0">
                                 <div class="col-md-6 offset-md-4">
                                     <button type="submit" class="btn btn-primary">
@@ -182,23 +137,41 @@
 
         </section>
     </div>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.4/axios.min.js" integrity="sha512-lTLt+W7MrmDfKam+r3D2LURu0F47a3QaW5nF0c6Hl0JDZ57ruei+ovbg7BrZ+0bjVJ5YgzsAWE+RreERbpPE1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
-        function userFunction(status){
+    
 
-            if(status == 2){
-                document.getElementById("merchant_area").style.display = 'inline';
-                document.getElementById("user_area").style.display = 'none';
-            }
-            else if(status == 1){
-                document.getElementById("merchant_area").style.display = 'none';
-                document.getElementById("user_area").style.display = 'inline';
-            }
-            else{
-                document.getElementById("merchant_area").style.display = 'none';
-                document.getElementById("user_area").style.display = 'none';
-            }
 
-        }
+        $(document).ready(function() {
+            var templateType = $('#topic_type');
+            templateType.change(function() {
+                var templateTypeValue = $('#topic_type').val();
+                let data={
+                    id:templateTypeValue
+                };
+                axios.post("{{route('notification.template.ajax')}}", data)
+                .then(function (response) {
+                    if (response.data.message) {
+                        $('#message').val(response.data.message)
+                    }else{
+                        $('#message').attr("placeholder", "Data is not Available....");
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                })
+      
+
+            });
+        });
+
+        $(document).ready(function() {
+            $('#user').select2();
+        });
+
+
         </script>
 
 @endsection

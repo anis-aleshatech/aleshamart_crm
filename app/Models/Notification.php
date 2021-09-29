@@ -15,9 +15,18 @@ class Notification extends Model
     {
         return $this->belongsTo(UsersType::class, 'user_type');
     }
+
+    public function users()
+    {
+        return $this->hasMany(User::class, 'id',   'user_id',);
+    }
+
+
     public function notificationTypes() {
         return $this->belongsTo(NotificationsType::class,'topic_type');
     }
+
+
     public static function notificationUserUpdateData($request) {
         $notification = Notification::find($request->id);
         $notificationImage = $request->file('image');

@@ -8,6 +8,7 @@ use App\Models\Merchant;
 use App\Models\Notification;
 use App\Models\NotificationsType;
 use App\Models\NotificationTemplate;
+use App\Models\User;
 use App\Models\UsersType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -34,7 +35,7 @@ class NotificationController extends Controller
         if(is_null($this->user) || !$this->user->can('notification.view')) {
             return view('admin.error.denied');
         } else {
-            $notifications = Notification::all();
+            $notifications = Notification::with('users')->get();
             return view('admin.notification.index',compact('notifications'));
         }
     }
@@ -43,10 +44,9 @@ class NotificationController extends Controller
         if(is_null($this->user) || !$this->user->can('notification.create')) {
             return view('admin.error.denied');
         } else {
-            $customers = Customer::all();
-            $userTypes = UsersType::where('status', 1)->get();
-            $notificationTypes = NotificationsType::where('status', 1)->get();
-            return view('admin.notification.create',compact('userTypes','notificationTypes','customers'));
+            $users = User::all();
+            $notificationTypes = NotificationsType::all();
+            return view('admin.notification.create',compact('notificationTypes','users'));
         }
     }
 
@@ -57,36 +57,16 @@ class NotificationController extends Controller
         } else {
             $validator = Validator::make($request->all(), [
                 'topic_type' => 'required',
-                'user_type' => 'required',
-                'image' => ['required|image'],
+                'user_id' => 'required',
                 'details' => 'required|string',
             ]);
-            if ($request->hasFile('image')) {
-                if($request->file('image')->isValid()) {
-                    try {
-                        $file = $request->file('image');
-                        $savePhotos = 'image_'.time() . '.' . $file->getClientOriginalExtension();
-                        $pathLarge = 'uploads/notification/'.$savePhotos;
-                        $this->imageResize($file,$pathLarge,$savePhotos, 600, null);
-
-                    }
-                    catch (Illuminate\Filesystem\FileNotFoundException $e) {
-                    }
-                }
-            }
-            else{
-                $savePhotos = '';
-            }
+       
             $notification = new Notification();
             $notification->user_id      = $request->user_id;
-            $notification->user_type    = $request->user_type;
-            $notification->merchant_id  = $request->merchant_id;
             $notification->topic_type   = $request->topic_type;
             $notification->details      = $request->details;
-            $notification->image        = $savePhotos;
-            $notification->status       = $request->status;
             $notification->save();
-            return  redirect('administration/index/notificationt')->with('success', 'Create Successfully !');
+            return  redirect()->route('notification.index')->with('success', 'Create Successfully !');
         }
     }
     public function notificationEdit($id) {
@@ -364,4 +344,12 @@ class NotificationController extends Controller
         $img->resizeCanvas($width, $height, 'center', false, array(255, 255, 255, 0));
         $img->save($path);
     }
+
+
+
+    public function notificationTypeAjax(Request $request) {
+        $notificationsTypes = NotificationTemplate::where('notifications_type_id', $request->id)->select('message')->first();
+        return response()->json($notificationsTypes);
+    }
+
 }
